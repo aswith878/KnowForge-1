@@ -2,56 +2,93 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import "../styles/sidebar.css";
 
+import {
+  FaHome,
+  FaBook,
+  FaIndustry,
+  FaRobot,
+  FaBullhorn,
+  FaBolt,
+  FaUserShield,
+} from "react-icons/fa";
+
 function Sidebar() {
   const { role } = useAuth();
 
   return (
     <aside className="sidebar">
 
-      <h2 className="sidebar-title">
-        KnowForge AI
-      </h2>
+      <div>
 
-      <nav>
+        <div className="sidebar-header">
 
-        <NavLink
-          to="/dashboard"
-          className="nav-link"
-        >
-          🏠 Dashboard
-        </NavLink>
+          <div className="sidebar-logo">
+            <FaBolt />
+          </div>
 
-        <NavLink
-          to="/knowledge-library"
-          className="nav-link"
-        >
-          📚 Knowledge Library
-        </NavLink>
+          <div>
 
-        <NavLink
-          to="/machines"
-          className="nav-link"
-        >
-          🏭 Machines
-        </NavLink>
+            <h2 className="sidebar-title">
+              KnowForge AI
+            </h2>
 
-        <NavLink
-          to="/ai-chat"
-          className="nav-link"
-        >
-          🤖 AI Chat
-        </NavLink>
+            <p className="sidebar-subtitle">
+              Enterprise Platform
+            </p>
 
-        <NavLink
-          to="/updates"
-          className="nav-link"
-        >
-          🔔 Updates
-        </NavLink>
+          </div>
 
-      </nav>
+        </div>
+
+        <nav className="sidebar-nav">
+
+          <NavLink
+            to="/dashboard"
+            className="nav-link"
+          >
+            <FaHome />
+            <span>Dashboard</span>
+          </NavLink>
+
+          <NavLink
+            to="/knowledge-library"
+            className="nav-link"
+          >
+            <FaBook />
+            <span>Knowledge Library</span>
+          </NavLink>
+
+          <NavLink
+            to="/machines"
+            className="nav-link"
+          >
+            <FaIndustry />
+            <span>Machines</span>
+          </NavLink>
+
+          <NavLink
+            to="/ai-chat"
+            className="nav-link"
+          >
+            <FaRobot />
+            <span>AI Assistant</span>
+          </NavLink>
+
+          <NavLink
+            to="/updates"
+            className="nav-link"
+          >
+            <FaBullhorn />
+            <span>Updates</span>
+          </NavLink>
+
+        </nav>
+
+      </div>
 
       <div className="sidebar-footer">
+
+        <FaUserShield className="footer-icon" />
 
         <small>Logged in as</small>
 

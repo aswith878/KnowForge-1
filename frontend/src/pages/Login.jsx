@@ -2,19 +2,25 @@ import "../styles/login.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+import {
+  FaEye,
+  FaEyeSlash,
+  FaEnvelope,
+  FaLock,
+  FaUser,
+  FaUserTag,
+} from "react-icons/fa";
 
 function Login() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("employee");
-
   const [showPassword, setShowPassword] = useState(false);
-
+  const [isSignup, setIsSignup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [isSignup, setIsSignup] = useState(false);
 
   const navigate = useNavigate();
   const { login, signup } = useAuth();
@@ -22,42 +28,27 @@ function Login() {
   const getErrorMessage = (error, fallback) => {
     if (!error) return fallback;
 
-    if (typeof error === "string") {
-      return error === "{}" ? fallback : error;
-    }
+    if (typeof error === "string") return error;
 
     if (typeof error === "object") {
       if (error.message) return error.message;
-      if (error.error) return getErrorMessage(error.error, fallback);
-      if (error.details) return String(error.details);
+      if (error.error) return error.error;
     }
 
     return fallback;
   };
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setErrorMessage("");
     setIsLoading(true);
 
-    if (!email || !password) {
-      setErrorMessage("Please fill all required fields.");
-      setIsLoading(false);
-      return;
-    }
-
-    if (isSignup && !fullName) {
-      setErrorMessage("Please enter your full name.");
-      setIsLoading(false);
-      return;
-    }
-
     try {
       if (isSignup) {
         const result = await signup(email, password, {
           full_name: fullName,
-          role: role,
+          role,
         });
 
         if (result.success) {
@@ -80,7 +71,7 @@ function Login() {
       }
     } catch (err) {
       setErrorMessage(
-        getErrorMessage(err, "An unexpected error occurred.")
+        getErrorMessage(err, "Unexpected error occurred.")
       );
     }
 
@@ -89,142 +80,247 @@ function Login() {
 
   return (
     <div className="login-container">
-      <div className="login-card">
 
-        <div className="header">
-          <h1 className="logo">KnowForge AI</h1>
+      <div className="bg-circle bg-circle-1"></div>
+      <div className="bg-circle bg-circle-2"></div>
+      <div className="bg-circle bg-circle-3"></div>
 
-          <p className="subtitle">
-            AI-Powered Industrial Knowledge Loss Prevention System
-          </p>
+      <div className="login-wrapper">
+
+        {/* LEFT SIDE */}
+
+        <div className="login-left">
+
+          <div className="brand">
+
+            <div className="brand-logo">
+              KF
+            </div>
+
+            <div>
+
+              <h1 className="logo">
+                KnowForge <span>AI</span>
+              </h1>
+
+              <p className="company-tag">
+                Industrial Knowledge Loss Prevention Platform
+              </p>
+
+            </div>
+
+          </div>
+
+          <div className="hero-content">
+
+            <div className="hero-chip">
+              Enterprise Artificial Intelligence Platform
+            </div>
+
+            <h2 className="hero-title">
+              Preserve Critical
+              <br />
+              <span>Industrial Knowledge</span>
+            </h2>
+
+            <p className="hero-description">
+              KnowForge AI securely captures expert knowledge,
+              documents, procedures and troubleshooting
+              experience before it is lost, enabling employees
+              to instantly retrieve trusted information using
+              Artificial Intelligence.
+            </p>
+
+          </div>
+
         </div>
 
-        <h2 className="login-title">
-          {isSignup ? "Create Account" : "Employee Login"}
-        </h2>
+        {/* RIGHT SIDE */}
 
-        {errorMessage && (
-          <div
-            style={{
-              background: "#ffe5e5",
-              color: "#d8000c",
-              padding: "10px",
-              borderRadius: "6px",
-              marginBottom: "15px",
-            }}
-          >
-            {errorMessage}
+        <div className="login-right">
+
+          <div className="login-card">
+
+            <div className="login-glass">
+
+              <div className="login-header">
+
+                <h2>
+                  {isSignup ? "Create Account" : "Welcome Back"}
+                </h2>
+
+                <p>
+                  {isSignup
+                    ? "Create your KnowForge AI account"
+                    : "Sign in to continue"}
+                </p>
+
+              </div>
+
+              {errorMessage && (
+                <div className="error-box">
+                  {errorMessage}
+                </div>
+              )}
+
+              <form
+                className="login-form"
+                onSubmit={handleSubmit}
+              >
+
+                {isSignup && (
+
+                  <div className="input-group">
+
+                    <label>Full Name</label>
+
+                    <div className="input-box">
+
+                      <FaUser className="input-icon" />
+
+                      <input
+                        type="text"
+                        placeholder="Enter your full name"
+                        value={fullName}
+                        onChange={(e) =>
+                          setFullName(e.target.value)
+                        }
+                        disabled={isLoading}
+                      />
+
+                    </div>
+
+                  </div>
+
+                )}
+                                <div className="input-group">
+
+                  <label>Email Address</label>
+
+                  <div className="input-box">
+
+                    <FaEnvelope className="input-icon" />
+
+                    <input
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                    />
+
+                  </div>
+
+                </div>
+
+                <div className="input-group">
+
+                  <label>Password</label>
+
+                  <div className="input-box">
+
+                    <FaLock className="input-icon" />
+
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                    />
+
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <FaEyeSlash />
+                      ) : (
+                        <FaEye />
+                      )}
+                    </button>
+
+                  </div>
+
+                </div>
+
+                {isSignup && (
+
+                  <div className="input-group">
+
+                    <label>Role</label>
+
+                    <div className="input-box">
+
+                      <FaUserTag className="input-icon" />
+
+                      <select
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        disabled={isLoading}
+                      >
+                        <option value="employee">Employee</option>
+                        <option value="expert">Expert</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                      </select>
+
+                    </div>
+
+                  </div>
+
+                )}
+
+                <button
+                  type="submit"
+                  className="login-btn"
+                  disabled={isLoading}
+                >
+                  {isLoading
+                    ? "Please Wait..."
+                    : isSignup
+                    ? "Create Account"
+                    : "Secure Login"}
+                </button>
+
+              </form>
+
+              <div className="divider">
+
+                <span></span>
+
+                <p>OR</p>
+
+                <span></span>
+
+              </div>
+
+              <button
+                className="switch-btn"
+                onClick={() => {
+                  setIsSignup(!isSignup);
+                  setFullName("");
+                  setEmail("");
+                  setPassword("");
+                  setRole("employee");
+                  setShowPassword(false);
+                  setErrorMessage("");
+                }}
+              >
+                {isSignup
+                  ? "Already have an account? Login"
+                  : "Don't have an account? Create One"}
+              </button>
+
+            </div>
+
           </div>
-        )}
 
-        <form className="login-form" onSubmit={handleLogin}>
-
-          {isSignup && (
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              disabled={isLoading}
-            />
-          )}
-
-          <input
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={isLoading}
-          />
-
-          {/* Password */}
-
-          <div className="password-wrapper">
-
-            <input
-              className="password-input"
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-            />
-
-            <button
-              type="button"
-              className="password-toggle"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
-
-          </div>
-
-          {isSignup && (
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              disabled={isLoading}
-            >
-              <option value="employee">Employee</option>
-              <option value="expert">Expert</option>
-              <option value="manager">Manager</option>
-              <option value="admin">Admin</option>
-            </select>
-          )}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading
-              ? "Please wait..."
-              : isSignup
-              ? "Create Account"
-              : "Secure Login"}
-          </button>
-
-        </form>
-
-        <p
-          style={{
-            marginTop: "15px",
-            textAlign: "center",
-          }}
-        >
-          {isSignup
-            ? "Already have an account?"
-            : "Don't have an account?"}
-
-          <button
-            type="button"
-            onClick={() => {
-              setIsSignup(!isSignup);
-              setErrorMessage("");
-              setFullName("");
-              setEmail("");
-              setPassword("");
-              setRole("employee");
-              setShowPassword(false);
-            }}
-            style={{
-              marginLeft: "8px",
-              border: "none",
-              background: "transparent",
-              color: "#3B82F6",
-              cursor: "pointer",
-              textDecoration: "underline",
-            }}
-          >
-            {isSignup ? "Login" : "Sign Up"}
-          </button>
-        </p>
-
-        <p className="company-name">
-          KnowForge AI
-        </p>
+        </div>
 
       </div>
+
     </div>
   );
 }

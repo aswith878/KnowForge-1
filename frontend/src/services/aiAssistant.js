@@ -1,45 +1,93 @@
 import { supabase } from "./supabase";
+import { askGemini } from "./geminiService";
 
-const definitions = {
-  cnc: "CNC (Computer Numerical Control) is an automated manufacturing process that controls machines using computers.",
+/* -----------------------------
+   Intent Detection
+--------------------------------*/
 
-  boiler:
-    "Industrial boilers produce steam or hot water for manufacturing processes. Regular inspection and safety checks are essential.",
+function detectIntent(question) {
+  const q = question.toLowerCase();
 
-  sop:
-    "SOP (Standard Operating Procedure) is a written document describing how a task should be performed safely and correctly.",
+  if (
+    q.includes("sop") ||
+    q.includes("procedure") ||
+    q.includes("operating procedure")
+  ) {
+    return "sop";
+  }
 
-  safety:
-    "Industrial safety includes practices that protect workers, equipment and the environment from accidents.",
+  if (
+    q.includes("safety") ||
+    q.includes("precaution") ||
+    q.includes("ppe")
+  ) {
+    return "safety";
+  }
 
-  maintenance:
-    "Maintenance is the inspection, servicing and repair of machines to prevent failures and downtime.",
+  if (
+    q.includes("maintenance") ||
+    q.includes("repair") ||
+    q.includes("fix")
+  ) {
+    return "maintenance";
+  }
 
-  machine:
-    "Industrial machines are used to manufacture products through cutting, drilling, milling, welding and assembly operations.",
+  if (
+    q.includes("summary") ||
+    q.includes("summarize") ||
+    q.includes("overview")
+  ) {
+    return "summary";
+  }
 
-  quality:
-    "Quality control ensures products satisfy industrial standards before delivery.",
+  return "general";
+}
 
-  warehouse:
-    "Warehouse management involves storing, tracking and handling industrial materials efficiently.",
+/* -----------------------------
+   Smart Ranking
+--------------------------------*/
 
-  production:
-    "Production is the process of converting raw materials into finished products."
-};
+function rankDocuments(question, docs) {
+  const words = question
+    .toLowerCase()
+    .replace(/[^\w\s]/g, "")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const ranked = docs.map((doc) => {
+    const text = `
+      ${doc.title || ""}
+      ${doc.category || ""}
+      ${doc.description || ""}
+    `.toLowerCase();
+
+    let score = 0;
+
+    words.forEach((word) => {
+      if (doc.title?.toLowerCase().includes(word)) score += 10;
+      if (doc.category?.toLowerCase().includes(word)) score += 5;
+      if (doc.description?.toLowerCase().includes(word)) score += 2;
+      if (text.includes(word)) score += 1;
+    });
+
+    return {
+      score,
+      document: doc,
+    };
+  });
+
+  ranked.sort((a, b) => b.score - a.score);
+
+  return ranked.filter((d) => d.score > 0);
+}
+
+/* -----------------------------
+   Main AI
+--------------------------------*/
 
 export async function askAI(question) {
 
-  const keyword = question.toLowerCase().trim();
-
-  let definition = "";
-
-  for (const key in definitions) {
-    if (keyword.includes(key)) {
-      definition = definitions[key];
-      break;
-    }
-  }
+  const intent = detectIntent(question);
 
   const { data, error } = await supabase
     .from("knowledge_library")
@@ -48,117 +96,133 @@ export async function askAI(question) {
   if (error) {
     return `
       <h3>❌ Error</h3>
-      Unable to search the knowledge library.
+      <p>Unable to search the knowledge library.</p>
     `;
   }
 
-  const words = keyword.split(" ");
+  const ranked = rankDocuments(question, data);
 
-  const results = data.filter((item) => {
+  let context = "";
 
-    const text = `
-      ${item.title}
-      ${item.category}
-      ${item.description}
-    `.toLowerCase();
+  ranked.slice(0, 3).forEach((item) => {
 
-    return words.some((word) => text.includes(word));
+    context += `
+Title:
+${item.document.title}
+
+Category:
+${item.document.category}
+
+Description:
+${item.document.description}
+
+------------------------
+`;
 
   });
 
-  let reply = "";
+  let prompt = `
+You are KnowForge AI.
 
-  reply += `
-    <h2>🤖 KnowForge AI</h2>
-  `;
+You are an Industrial Knowledge Assistant.
 
-  if (definition !== "") {
+Answer professionally.
 
-    reply += `
-      <h3>Definition</h3>
+Use ONLY the company knowledge below.
 
-      <p>${definition}</p>
+If information is not available, clearly say:
 
-      <hr>
-    `;
+"I couldn't find complete information inside the company knowledge library."
+
+Employee Question:
+
+${question}
+
+Intent:
+
+${intent}
+
+Company Knowledge:
+
+${context}
+`;
+
+  const aiAnswer = await askGemini(prompt);
+
+  let html = `
+<h2>🤖 KnowForge AI</h2>
+
+<div style="
+background:#172554;
+padding:18px;
+border-radius:12px;
+margin-bottom:20px;
+">
+
+${aiAnswer.replace(/\n/g,"<br>")}
+
+</div>
+`;
+
+  if (ranked.length > 0) {
+
+    html += `
+<hr>
+
+<h3>📚 Related Documents</h3>
+`;
+
+    ranked.slice(0,5).forEach((item)=>{
+
+      html += `
+<div style="
+background:#1E293B;
+border:1px solid #334155;
+padding:18px;
+border-radius:12px;
+margin-bottom:15px;
+">
+
+<h3>${item.document.title}</h3>
+
+<p>
+
+<b>Category:</b>
+
+${item.document.category}
+
+</p>
+
+<p>
+
+${item.document.description}
+
+</p>
+
+<a
+href="${item.document.file_url}"
+target="_blank"
+style="
+display:inline-block;
+padding:10px 16px;
+background:#2563EB;
+color:white;
+text-decoration:none;
+border-radius:8px;
+margin-top:10px;
+"
+>
+
+📂 Open File
+
+</a>
+
+</div>
+`;
+
+    });
 
   }
 
-  if (results.length === 0) {
-
-    reply += `
-      <h3>No Related Knowledge Found</h3>
-
-      <p>
-      No document in the knowledge library matches your query.
-      </p>
-
-      <p><b>Confidence :</b> Medium</p>
-    `;
-
-    return reply;
-
-  }
-
-  reply += `
-    <h3>📚 Related Knowledge</h3>
-
-    <p>
-    Found <b>${results.length}</b> related document(s).
-    </p>
-  `;
-
-  results.forEach((doc, index) => {
-
-    reply += `
-      <div style="
-        background:#1E293B;
-        border:1px solid #334155;
-        border-radius:12px;
-        padding:15px;
-        margin-bottom:18px;
-      ">
-
-        <h3>${index + 1}. ${doc.title}</h3>
-
-        <p>
-        <b>Category:</b> ${doc.category}
-        </p>
-
-        <p>
-        <b>Description:</b><br>
-        ${doc.description}
-        </p>
-
-        <a
-          href="${doc.file_url}"
-          target="_blank"
-          style="
-            display:inline-block;
-            background:#2563EB;
-            color:white;
-            padding:10px 18px;
-            border-radius:8px;
-            text-decoration:none;
-            margin-top:10px;
-          "
-        >
-          📂 Open Document
-        </a>
-
-      </div>
-    `;
-
-  });
-
-  reply += `
-    <hr>
-
-    <p>
-    <b>AI Confidence :</b> High ✅
-    </p>
-  `;
-
-  return reply;
-
+  return html;
 }

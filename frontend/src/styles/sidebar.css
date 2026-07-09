@@ -1,86 +1,242 @@
-.sidebar {
-    position: fixed;
-    top: 70px;
-    left: 0;
-    width: 260px;
-    height: calc(100vh - 70px);
-    background: #172033;
-    border-right: 1px solid #334155;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+/* ====================================
+   SIDEBAR
+==================================== */
+
+.sidebar{
+
+    position:fixed;
+
+    top:72px;
+    left:0;
+
+    width:270px;
+
+    height:calc(100vh - 72px);
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
+    background:#111827;
+
+    border-right:1px solid rgba(255,255,255,.06);
+
 }
 
-.sidebar-title {
-    color: #ffffff;
-    text-align: center;
-    padding: 25px 0;
-    font-size: 22px;
-    font-weight: 700;
-    border-bottom: 1px solid #334155;
+/* ====================================
+   HEADER
+==================================== */
+
+.sidebar-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:28px 24px;
+
+    border-bottom:1px solid rgba(255,255,255,.05);
+
 }
 
-.sidebar nav {
-    flex: 1;
-    margin-top: 10px;
+.sidebar-logo{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:16px;
+
+    background:linear-gradient(135deg,#6366F1,#8B5CF6);
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:white;
+
+    font-size:20px;
+
+    box-shadow:0 12px 30px rgba(99,102,241,.35);
+
 }
 
-.nav-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 16px 22px;
-    color: #e2e8f0;
-    text-decoration: none;
-    font-size: 16px;
-    transition: all 0.3s ease;
+.sidebar-title{
+
+    color:white;
+
+    font-size:20px;
+
+    margin-bottom:4px;
+
 }
 
-.nav-link:hover {
-    background: #2563eb;
-    color: white;
-    padding-left: 28px;
+.sidebar-subtitle{
+
+    color:#94A3B8;
+
+    font-size:13px;
+
 }
 
-.nav-link.active {
-    background: #2563eb;
-    border-left: 5px solid #60a5fa;
-    color: white;
-    font-weight: 600;
+/* ====================================
+   NAVIGATION
+==================================== */
+
+.sidebar-nav{
+
+    padding:18px 14px;
+
 }
 
-.sidebar-footer {
-    border-top: 1px solid #334155;
-    padding: 18px;
-    text-align: center;
+.nav-link{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    padding:15px 18px;
+
+    margin-bottom:8px;
+
+    border-radius:14px;
+
+    text-decoration:none;
+
+    color:#CBD5E1;
+
+    transition:.25s;
+
+    font-size:15px;
+
+    font-weight:500;
+
 }
 
-.sidebar-footer small {
-    color: #94a3b8;
-    display: block;
-    margin-bottom: 5px;
+.nav-link svg{
+
+    font-size:18px;
+
+    min-width:18px;
+
 }
 
-.sidebar-footer h4 {
-    color: #ffffff;
-    margin: 0;
-    font-size: 17px;
+.nav-link:hover{
+
+    background:#1E293B;
+
+    color:white;
+
+    transform:translateX(5px);
+
 }
 
-@media (max-width: 768px) {
+.nav-link.active{
 
-    .sidebar {
-        width: 220px;
-    }
+    background:linear-gradient(90deg,#2563EB,#3B82F6);
 
-    .sidebar-title {
-        font-size: 18px;
-    }
+    color:white;
 
-    .nav-link {
-        font-size: 15px;
-        padding: 14px 18px;
-    }
+    box-shadow:0 10px 25px rgba(37,99,235,.30);
+
+}
+
+/* ====================================
+   FOOTER
+==================================== */
+
+.sidebar-footer{
+
+    padding:22px;
+
+    border-top:1px solid rgba(255,255,255,.05);
+
+    text-align:center;
+
+}
+
+.footer-icon{
+
+    font-size:32px;
+
+    color:#6366F1;
+
+    margin-bottom:10px;
+
+}
+
+.sidebar-footer small{
+
+    display:block;
+
+    color:#94A3B8;
+
+    margin-bottom:8px;
+
+}
+
+.sidebar-footer h4{
+
+    color:white;
+
+    font-size:17px;
+
+}
+
+/* ====================================
+   SCROLLBAR
+==================================== */
+
+.sidebar::-webkit-scrollbar{
+
+    width:6px;
+
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+
+    background:#374151;
+
+    border-radius:20px;
+
+}
+
+/* ====================================
+   MOBILE
+==================================== */
+
+@media(max-width:768px){
+
+.sidebar{
+
+    width:220px;
+
+}
+
+.sidebar-title{
+
+    font-size:17px;
+
+}
+
+.sidebar-subtitle{
+
+    display:none;
+
+}
+
+.nav-link span{
+
+    font-size:14px;
+
+}
 
 }

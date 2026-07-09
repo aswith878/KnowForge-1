@@ -1,23 +1,566 @@
+/* =====================================================
+   DASHBOARD LAYOUT
+===================================================== */
+
 .dashboard{
     width:100%;
-    max-width:1400px;
-    margin:0 auto;
+    max-width:1700px;
+    margin:auto;
+    padding:30px;
     display:flex;
     flex-direction:column;
-    gap:30px;          /* ← Gap between sections */
-    padding:20px;
+    gap:32px;
 }
+
+/* =====================================================
+   HERO SECTION
+===================================================== */
+
+.dashboard-hero{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:40px;
+    padding:40px;
+    border-radius:28px;
+    background:
+        radial-gradient(circle at top left,#3b82f620,transparent 45%),
+        linear-gradient(135deg,#1f2937,#111827);
+    border:1px solid rgba(255,255,255,.06);
+    box-shadow:0 20px 45px rgba(0,0,0,.28);
+}
+
+.dashboard-hero h1{
+    font-size:58px;
+    color:#fff;
+    font-weight:800;
+    margin-bottom:14px;
+    line-height:1.1;
+}
+
+.dashboard-hero p{
+    color:#94A3B8;
+    font-size:20px;
+    line-height:1.8;
+    max-width:720px;
+}
+
+/* =====================================================
+   AI CARD
+===================================================== */
+
+.hero-ai-card{
+    min-width:360px;
+    background:linear-gradient(145deg,#2563eb,#1d4ed8);
+    border-radius:24px;
+    padding:28px;
+    color:#fff;
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    box-shadow:0 20px 40px rgba(37,99,235,.30);
+    transition:.35s;
+}
+
+.hero-ai-card:hover{
+    transform:translateY(-8px);
+    box-shadow:0 28px 55px rgba(37,99,235,.45);
+}
+
+.hero-ai-icon{
+    font-size:46px;
+}
+
+.hero-ai-card h3{
+    font-size:24px;
+    margin:0;
+    font-weight:700;
+}
+
+.hero-ai-card p{
+    color:#dbeafe;
+    margin:0;
+    font-size:15px;
+    line-height:1.6;
+}
+
+.hero-ai-card button{
+    margin-top:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    border:none;
+    background:#fff;
+    color:#2563eb;
+    font-weight:700;
+    padding:14px;
+    border-radius:12px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.hero-ai-card button:hover{
+    transform:translateY(-3px);
+    background:#eff6ff;
+}
+
+/* =====================================================
+   KPI GRID
+===================================================== */
 
 .stats-grid{
     display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+    gap:24px;
+}
+
+/* =====================================================
+   STAT CARD
+===================================================== */
+
+.stat-card{
+    position:relative;
+    overflow:hidden;
+    background:linear-gradient(145deg,#1f2937,#111827);
+    border-radius:24px;
+    padding:30px;
+    border:1px solid rgba(255,255,255,.06);
+    transition:.35s;
+    box-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+
+.stat-card:hover{
+    transform:translateY(-8px);
+    border-color:#3b82f6;
+    box-shadow:0 22px 45px rgba(37,99,235,.18);
+}
+
+.stat-card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:5px;
+    background:linear-gradient(
+        90deg,
+        #2563eb,
+        #3b82f6,
+        #06b6d4
+    );
+}
+
+/* =====================================================
+   ICON
+===================================================== */
+
+.stat-icon{
+    width:72px;
+    height:72px;
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    color:#fff;
+    margin-bottom:24px;
+    background:linear-gradient(135deg,#2563eb,#3b82f6);
+    box-shadow:0 10px 25px rgba(37,99,235,.30);
+}
+
+/* =====================================================
+   TITLE & VALUE
+===================================================== */
+
+.stat-title{
+    color:#94A3B8;
+    font-size:16px;
+    font-weight:600;
+    margin-bottom:12px;
+}
+
+.stat-value{
+    color:#fff;
+    font-size:46px;
+    font-weight:800;
+    line-height:1;
+    margin-bottom:20px;
+}
+
+/* =====================================================
+   MINI PROGRESS
+===================================================== */
+
+.stat-progress{
+    width:100%;
+    height:10px;
+    border-radius:30px;
+    overflow:hidden;
+    background:#243244;
+}
+
+.stat-progress span{
+    display:block;
+    height:100%;
+    width:85%;
+    border-radius:30px;
+    background:linear-gradient(
+        90deg,
+        #2563eb,
+        #3b82f6,
+        #06b6d4
+    );
+}
+
+/* =====================================================
+   GROWTH BADGE
+===================================================== */
+
+.stat-growth{
+    position:absolute;
+    top:24px;
+    right:24px;
+    padding:8px 14px;
+    border-radius:30px;
+    background:rgba(34,197,94,.12);
+    color:#22c55e;
+    font-size:13px;
+    font-weight:700;
+}
+/* =====================================================
+   DASHBOARD GRID
+===================================================== */
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:28px;
+    align-items:stretch;
+}
+
+/* =====================================================
+   DASHBOARD PANEL
+===================================================== */
+
+.dashboard-panel{
+    background:linear-gradient(145deg,#1f2937,#111827);
+    border-radius:24px;
+    padding:30px;
+    border:1px solid rgba(255,255,255,.06);
+    box-shadow:0 12px 28px rgba(0,0,0,.22);
+    transition:.35s;
+    position:relative;
+    overflow:hidden;
+}
+
+.dashboard-panel::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:4px;
+    background:linear-gradient(
+        90deg,
+        #3b82f6,
+        #06b6d4
+    );
+}
+
+.dashboard-panel:hover{
+    transform:translateY(-6px);
+    border-color:#3b82f6;
+    box-shadow:0 20px 40px rgba(59,130,246,.16);
+}
+
+/* =====================================================
+   PANEL HEADER
+===================================================== */
+
+.panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+}
+
+.panel-header h2{
+    color:#fff;
+    font-size:26px;
+    font-weight:700;
+    margin:0;
+}
+
+.panel-header span{
+    padding:8px 16px;
+    border-radius:30px;
+    background:rgba(34,197,94,.12);
+    color:#22c55e;
+    font-size:13px;
+    font-weight:700;
+}
+
+/* =====================================================
+   SYSTEM OVERVIEW
+===================================================== */
+
+.overview-list{
+    display:grid;
     grid-template-columns:repeat(2,1fr);
-    gap:30px;
+    gap:18px;
 }
 
-.machine-status-card{
-    margin-top:0;
+.overview-item{
+    background:#0f172a;
+    border:1px solid rgba(255,255,255,.05);
+    border-radius:18px;
+    padding:22px;
+    transition:.30s;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
 }
 
-.recent-updates-card{
-    margin-top:0;
+.overview-item:hover{
+    transform:translateY(-5px);
+    border-color:#3b82f6;
+    background:#162133;
+}
+
+.overview-item span{
+    color:#94A3B8;
+    font-size:15px;
+    font-weight:500;
+}
+
+.overview-item strong{
+    color:#fff;
+    font-size:34px;
+    font-weight:800;
+}
+
+/* =====================================================
+   KNOWLEDGE HEALTH
+===================================================== */
+
+.progress-wrapper{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.progress-title{
+    color:#CBD5E1;
+    font-size:17px;
+    font-weight:600;
+}
+
+.progress-bar{
+    width:100%;
+    height:16px;
+    border-radius:50px;
+    overflow:hidden;
+    background:#243244;
+}
+
+.progress-fill{
+    height:100%;
+    border-radius:50px;
+    background:linear-gradient(
+        90deg,
+        #22c55e,
+        #3b82f6,
+        #06b6d4
+    );
+    transition:width .8s ease;
+}
+
+.progress-wrapper h3{
+    color:#fff;
+    font-size:46px;
+    margin:0;
+    font-weight:800;
+}
+
+.progress-wrapper p{
+    color:#94A3B8;
+    line-height:1.8;
+    font-size:15px;
+}
+
+/* =====================================================
+   DASHBOARD SECTIONS
+===================================================== */
+
+.dashboard-section{
+    width:100%;
+}
+/* =====================================================
+   DASHBOARD GRID
+===================================================== */
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:28px;
+    align-items:stretch;
+}
+
+/* =====================================================
+   DASHBOARD PANEL
+===================================================== */
+
+.dashboard-panel{
+    background:linear-gradient(145deg,#1f2937,#111827);
+    border-radius:24px;
+    padding:30px;
+    border:1px solid rgba(255,255,255,.06);
+    box-shadow:0 12px 28px rgba(0,0,0,.22);
+    transition:.35s;
+    position:relative;
+    overflow:hidden;
+}
+
+.dashboard-panel::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:4px;
+    background:linear-gradient(
+        90deg,
+        #3b82f6,
+        #06b6d4
+    );
+}
+
+.dashboard-panel:hover{
+    transform:translateY(-6px);
+    border-color:#3b82f6;
+    box-shadow:0 20px 40px rgba(59,130,246,.16);
+}
+
+/* =====================================================
+   PANEL HEADER
+===================================================== */
+
+.panel-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:28px;
+}
+
+.panel-header h2{
+    color:#fff;
+    font-size:26px;
+    font-weight:700;
+    margin:0;
+}
+
+.panel-header span{
+    padding:8px 16px;
+    border-radius:30px;
+    background:rgba(34,197,94,.12);
+    color:#22c55e;
+    font-size:13px;
+    font-weight:700;
+}
+
+/* =====================================================
+   SYSTEM OVERVIEW
+===================================================== */
+
+.overview-list{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.overview-item{
+    background:#0f172a;
+    border:1px solid rgba(255,255,255,.05);
+    border-radius:18px;
+    padding:22px;
+    transition:.30s;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.overview-item:hover{
+    transform:translateY(-5px);
+    border-color:#3b82f6;
+    background:#162133;
+}
+
+.overview-item span{
+    color:#94A3B8;
+    font-size:15px;
+    font-weight:500;
+}
+
+.overview-item strong{
+    color:#fff;
+    font-size:34px;
+    font-weight:800;
+}
+
+/* =====================================================
+   KNOWLEDGE HEALTH
+===================================================== */
+
+.progress-wrapper{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.progress-title{
+    color:#CBD5E1;
+    font-size:17px;
+    font-weight:600;
+}
+
+.progress-bar{
+    width:100%;
+    height:16px;
+    border-radius:50px;
+    overflow:hidden;
+    background:#243244;
+}
+
+.progress-fill{
+    height:100%;
+    border-radius:50px;
+    background:linear-gradient(
+        90deg,
+        #22c55e,
+        #3b82f6,
+        #06b6d4
+    );
+    transition:width .8s ease;
+}
+
+.progress-wrapper h3{
+    color:#fff;
+    font-size:46px;
+    margin:0;
+    font-weight:800;
+}
+
+.progress-wrapper p{
+    color:#94A3B8;
+    line-height:1.8;
+    font-size:15px;
+}
+
+/* =====================================================
+   DASHBOARD SECTIONS
+===================================================== */
+
+.dashboard-section{
+    width:100%;
 }

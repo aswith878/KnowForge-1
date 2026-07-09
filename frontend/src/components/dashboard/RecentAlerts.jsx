@@ -1,85 +1,124 @@
 import { useEffect, useState } from "react";
-import { supabase } from "../../services/supabase";
-
 import "../../styles/recentAlerts.css";
+import { supabase } from "../../services/supabase";
+import {
+  FaExclamationCircle,
+  FaInfoCircle,
+  FaCheckCircle,
+  FaClock,
+} from "react-icons/fa";
 
 function RecentAlerts() {
-  const [announcements, setAnnouncements] = useState([]);
+  const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadAnnouncements();
+    fetchAlerts();
   }, []);
 
-  async function loadAnnouncements() {
+  async function fetchAlerts() {
     setLoading(true);
 
     const { data, error } = await supabase
       .from("company_announcements")
       .select("*")
-      .order("created_at", { ascending: false })
-      .limit(5);
+      .order("created_at", { ascending: false });
 
-    if (!error) {
-      setAnnouncements(data || []);
+    if (error) {
+      console.error(error);
+    } else {
+      setAlerts(data || []);
     }
 
     setLoading(false);
   }
 
+  function getPriorityIcon(priority) {
+    switch ((priority || "").toLowerCase()) {
+      case "high":
+        return <FaExclamationCircle />;
+      case "normal":
+        return <FaInfoCircle />;
+      case "low":
+        return <FaCheckCircle />;
+      default:
+        return <FaInfoCircle />;
+    }
+  }
+
+  if (loading) {
+    return (
+      <section className="recent-alerts">
+        <div className="alerts-header">
+          <div>
+            <h2>Recent Updates</h2>
+            <p>Latest announcements from the organization</p>
+          </div>
+        </div>
+
+        <div className="loading-alerts">
+          Loading recent updates...
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <div className="recent-alerts">
-
-      <h2>Recent Updates</h2>
-
-      {loading ? (
-
-        <div className="recent-empty">
-          Loading updates...
+    <section className="recent-alerts">
+      <div className="alerts-header">
+        <div>
+          <h2>Recent Updates</h2>
+          <p>Latest announcements from the organization</p>
         </div>
+      </div>
 
-      ) : announcements.length === 0 ? (
-
-        <div className="recent-empty">
-          No updates available.
+      {alerts.length === 0 ? (
+        <div className="loading-alerts">
+          No recent updates available.
         </div>
-
       ) : (
-
-        <div className="recent-list">
-
-          {announcements.map((item) => (
-
+        <div className="recent-alerts-list">
+          {alerts.map((alert) => (
             <div
-              key={item.id}
-              className="recent-item"
+              key={alert.id}
+              className={`alert-card ${(alert.priority || "Normal").toLowerCase()}`}
             >
+              <div className="alert-header">
+                <div className="alert-title">
+                  <div
+                    className={`alert-icon ${(alert.priority || "Normal").toLowerCase()}`}
+                  >
+                    {getPriorityIcon(alert.priority)}
+                  </div>
 
-              <div className="recent-top">
+                  <div>
+                    <h3>{alert.title}</h3>
+                  </div>
+                </div>
 
-                <h3>{item.title}</h3>
-
-                <span className={`priority ${item.priority?.toLowerCase()}`}>
-                  {item.priority}
+                <span
+                  className={`priority-badge ${(alert.priority || "Normal").toLowerCase()}`}
+                >
+                  {alert.priority || "Normal"}
                 </span>
-
               </div>
 
-              <p>{item.message}</p>
+              <div className="alert-message">
+                {alert.message}
+              </div>
 
-              <small>
-                {new Date(item.created_at).toLocaleDateString()}
-              </small>
+              <div className="alert-footer">
+                <FaClock />
 
+                <span>
+                  {new Date(alert.created_at).toLocaleDateString()}
+                </span>
+              </div>
             </div>
-
           ))}
-
         </div>
-
       )}
-
-    </div>
+    </section>
   );
 }
 

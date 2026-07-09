@@ -9,6 +9,7 @@
     "lint": "cd frontend && npm run lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "react-icons": "^5.7.0",
     "react-router-dom": "^7.18.1"
   }

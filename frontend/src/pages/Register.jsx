@@ -1,170 +1,155 @@
-import "../styles/register.css";
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "../services/supabase";
+import { useEffect, useState } from "react";
+import { supabase } from "../../services/supabase";
 
-function Register() {
-  const navigate = useNavigate();
+import {
+  FaBell,
+  FaExclamationTriangle,
+  FaCheckCircle,
+  FaInfoCircle,
+  FaClock
+} from "react-icons/fa";
 
-  const [loading, setLoading] = useState(false);
+import "../../styles/recentAlerts.css";
 
-  const [formData, setFormData] = useState({
-    full_name: "",
-    employee_id: "",
-    department: "",
-    role: "Employee",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+function RecentAlerts() {
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
+  const [announcements, setAnnouncements] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    loadAnnouncements();
+  }, []);
 
-    if (
-      !formData.full_name ||
-      !formData.employee_id ||
-      !formData.department ||
-      !formData.email ||
-      !formData.password
-    ) {
-      alert("Please fill all fields.");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match.");
-      return;
-    }
+  async function loadAnnouncements() {
 
     setLoading(true);
 
-    const normalizedRole = formData.role.toLowerCase();
+    const { data, error } = await supabase
+      .from("company_announcements")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(5);
 
-    const { data, error } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-      options: {
-        data: {
-          full_name: formData.full_name,
-          employee_id: formData.employee_id,
-          department: formData.department,
-          role: normalizedRole,
-        },
-      },
-    });
-
-    if (error) {
-      console.error(error);
-      const normalizedError =
-        error?.message ||
-        error?.error?.message ||
-        (typeof error === "string" ? error : null) ||
-        (typeof error === "object" && Object.keys(error).length > 0
-          ? JSON.stringify(error)
-          : null);
-
-      alert(normalizedError || "Registration failed.");
-      setLoading(false);
-      return;
+    if (!error) {
+      setAnnouncements(data || []);
     }
 
-    alert("Registration Successful!");
-
-    navigate("/login");
-
     setLoading(false);
+  }
+
+  const getPriorityIcon = (priority) => {
+
+    switch ((priority || "").toLowerCase()) {
+
+      case "high":
+        return <FaExclamationTriangle />;
+
+      case "low":
+        return <FaCheckCircle />;
+
+      default:
+        return <FaInfoCircle />;
+    }
+
   };
 
   return (
-    <div className="register-container">
-      <div className="register-card">
 
-        <h1>KnowForge AI</h1>
+    <div className="recent-alerts">
 
-        <p>Create Employee Account</p>
+      <div className="alerts-header">
 
-        <form onSubmit={handleRegister}>
+        <div>
 
-          <input
-            type="text"
-            name="full_name"
-            placeholder="Full Name"
-            value={formData.full_name}
-            onChange={handleChange}
-          />
+          <h2>Recent Alerts</h2>
 
-          <input
-            type="text"
-            name="employee_id"
-            placeholder="Employee ID"
-            value={formData.employee_id}
-            onChange={handleChange}
-          />
+          <p>Latest announcements and company updates</p>
 
-          <input
-            type="text"
-            name="department"
-            placeholder="Department"
-            value={formData.department}
-            onChange={handleChange}
-          />
+        </div>
 
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-          >
-            <option>Employee</option>
-            <option>Expert</option>
-            <option>Manager</option>
-          </select>
+        <div className="alerts-icon">
 
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-          />
+          <FaBell />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-          />
-
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-
-          <button type="submit" disabled={loading}>
-            {loading ? "Creating..." : "Create Account"}
-          </button>
-
-        </form>
-
-        <div className="bottom-text">
-          Already have an account?
-          <Link to="/login"> Login</Link>
         </div>
 
       </div>
+
+      {loading ? (
+
+        <div className="recent-empty">
+
+          Loading Updates...
+
+        </div>
+
+      ) : announcements.length === 0 ? (
+
+        <div className="recent-empty">
+
+          No announcements available.
+
+        </div>
+
+      ) : (
+
+        <div className="alerts-timeline">
+                    {announcements.map((item) => (
+
+            <div
+              key={item.id}
+              className="alert-card"
+            >
+
+              <div
+                className={`alert-icon ${item.priority?.toLowerCase()}`}
+              >
+                {getPriorityIcon(item.priority)}
+              </div>
+
+              <div className="alert-content">
+
+                <div className="alert-top">
+
+                  <h3>{item.title}</h3>
+
+                  <span
+                    className={`priority ${item.priority?.toLowerCase()}`}
+                  >
+                    {item.priority || "Normal"}
+                  </span>
+
+                </div>
+
+                <p>{item.message}</p>
+
+                <div className="alert-footer">
+
+                  <span>
+
+                    <FaClock />
+
+                    {new Date(item.created_at).toLocaleDateString()}
+
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      )}
+
     </div>
+
   );
+
 }
 
-export default Register;
+export default RecentAlerts;
+        

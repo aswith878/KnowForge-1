@@ -1,5 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+import {
+  FaSearch,
+  FaPlus,
+  FaCog,
+  FaPlayCircle,
+  FaTools,
+  FaPowerOff,
+  FaMapMarkerAlt,
+  FaIndustry,
+  FaEye,
+} from "react-icons/fa";
 
 import "../styles/machineManagement.css";
 
@@ -10,17 +22,13 @@ import { supabase } from "../services/supabase";
 import { useAuth } from "../contexts/AuthContext";
 
 function MachineManagement() {
-
   const navigate = useNavigate();
 
   const { role } = useAuth();
 
   const [machines, setMachines] = useState([]);
-
-  const [search, setSearch] = useState("");
-
   const [loading, setLoading] = useState(true);
-
+  const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -28,69 +36,66 @@ function MachineManagement() {
   }, []);
 
   async function fetchMachines() {
-
     setLoading(true);
 
     const { data, error } = await supabase
       .from("machines")
       .select("*")
-      .order("machine_number", {
-        ascending: true,
-      });
+      .order("machine_id", { ascending: true });
 
     if (error) {
-
       console.error(error);
-
     } else {
-
       setMachines(data || []);
-
     }
 
     setLoading(false);
-
   }
 
-  const filteredMachines = machines.filter((machine) => {
+  const filteredMachines = useMemo(() => {
+    const value = search.toLowerCase();
 
-    const text = search.toLowerCase();
+    return machines.filter((machine) => {
+      return (
+        machine.machine_id?.toLowerCase().includes(value) ||
+        machine.machine_name?.toLowerCase().includes(value) ||
+        machine.department?.toLowerCase().includes(value) ||
+        machine.location?.toLowerCase().includes(value) ||
+        machine.manufacturer?.toLowerCase().includes(value)
+      );
+    });
+  }, [machines, search]);
 
-    return (
+  const totalMachines = machines.length;
 
-      machine.machine_number
-        ?.toLowerCase()
-        .includes(text) ||
+  const runningMachines = machines.filter(
+    (m) => m.status === "Running"
+  ).length;
 
-      machine.machine_name
-        ?.toLowerCase()
-        .includes(text) ||
+  const maintenanceMachines = machines.filter(
+    (m) => m.status === "Maintenance"
+  ).length;
 
-      machine.department
-        ?.toLowerCase()
-        .includes(text)
-
-    );
-
-  });
+  const offlineMachines = machines.filter(
+    (m) => m.status === "Offline"
+  ).length;
 
   return (
-
     <AppLayout>
 
       <div className="machine-page">
 
-        <div className="page-header">
+        {/* ================= HEADER ================= */}
+
+        <div className="machine-page-header">
 
           <div>
 
             <h1>Machine Management</h1>
 
             <p>
-
-              Manage all industrial machines,
-              departments and maintenance records.
-
+              Monitor and manage every industrial machine across
+              your organization.
             </p>
 
           </div>
@@ -100,173 +105,277 @@ function MachineManagement() {
             role === "Admin") && (
 
             <button
-
               className="add-machine-btn"
-
               onClick={() => setShowModal(true)}
-
             >
+              <FaPlus />
 
-              + Add Machine
-
+              Add Machine
             </button>
 
           )}
 
         </div>
 
-        <input
+        {/* ================= STATS ================= */}
 
-          className="machine-search"
+        <div className="machine-stats">
 
-          placeholder="Search Machine..."
+          <div className="machine-stat-card total">
 
-          value={search}
+            <div className="stat-icon">
+              <FaCog />
+            </div>
 
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
+            <div>
 
-        />
+              <h2>{totalMachines}</h2>
 
-        <table className="machine-table">
+              <p>Total Machines</p>
 
-          <thead>
+            </div>
 
-            <tr>
+          </div>
 
-              <th>Machine No</th>
+          <div className="machine-stat-card running">
 
-              <th>Machine Name</th>
+            <div className="stat-icon">
+              <FaPlayCircle />
+            </div>
 
-              <th>Department</th>
+            <div>
 
-              <th>Status</th>
+              <h2>{runningMachines}</h2>
 
-              <th>Action</th>
+              <p>Running</p>
 
-            </tr>
+            </div>
 
-          </thead>
+          </div>
 
-          <tbody>
+          <div className="machine-stat-card maintenance">
 
-            {loading ? (
+            <div className="stat-icon">
+              <FaTools />
+            </div>
 
-              <tr>
+            <div>
 
-                <td
-                  colSpan="5"
-                  style={{
-                    textAlign: "center",
-                  }}
+              <h2>{maintenanceMachines}</h2>
+
+              <p>Maintenance</p>
+
+            </div>
+
+          </div>
+
+          <div className="machine-stat-card offline">
+
+            <div className="stat-icon">
+              <FaPowerOff />
+            </div>
+
+            <div>
+
+              <h2>{offlineMachines}</h2>
+
+              <p>Offline</p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* ================= SEARCH ================= */}
+
+        <div className="machine-search-wrapper">
+
+          <FaSearch className="search-icon" />
+
+          <input
+            className="machine-search"
+            placeholder="Search by ID, Name, Department, Location or Manufacturer..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+        </div>
+
+        {/* ================= MACHINE GRID ================= */}
+
+        <div className="machines-grid">
+
+          {loading ? (
+
+            <div className="machine-loading">
+
+              Loading Machines...
+
+            </div>
+
+          ) : filteredMachines.length === 0 ? (
+
+            <div className="machine-loading">
+
+              No Machines Found
+
+            </div>
+
+          ) : (
+
+            filteredMachines.map((machine) => {
+
+              const status = (machine.status || "").toLowerCase();
+
+              return (
+
+                <div
+                  key={machine.id}
+                  className={`machine-card ${status}`}
                 >
 
-                  Loading...
+                  <div className="machine-card-header">
 
-                </td>
+                    <div>
 
-              </tr>
+                      <span className="machine-id">
+                        {machine.machine_id}
+                      </span>
 
-            ) : filteredMachines.length === 0 ? (
+                      <h3>
+                        {machine.machine_name}
+                      </h3>
 
-              <tr>
-
-                <td
-                  colSpan="5"
-                  style={{
-                    textAlign: "center",
-                  }}
-                >
-
-                  No Machines Available
-
-                </td>
-
-              </tr>
-
-            ) : (
-
-              filteredMachines.map((machine) => (
-
-                <tr key={machine.id}>
-
-                  <td>
-
-                    {machine.machine_number}
-
-                  </td>
-
-                  <td>
-
-                    {machine.machine_name}
-
-                  </td>
-
-                  <td>
-
-                    {machine.department}
-
-                  </td>
-
-                  <td>
+                    </div>
 
                     <span
-                      className={`status ${machine.status
-                        ?.toLowerCase()
-                        .replace(/\s/g, "-")}`}
+                      className={`status ${status}`}
                     >
-
                       {machine.status}
-
                     </span>
 
-                  </td>
+                  </div>
 
-                  <td>
+                  <div className="machine-info">
+
+                    <div className="info-row">
+
+                      <FaIndustry />
+
+                      <span>
+                        {machine.department}
+                      </span>
+
+                    </div>
+
+                    <div className="info-row">
+
+                      <FaMapMarkerAlt />
+
+                      <span>
+                        {machine.location || "Not Specified"}
+                      </span>
+
+                    </div>
+
+                    <div className="info-row">
+
+                      <strong>Manufacturer :</strong>
+
+                      <span>
+                        {machine.manufacturer || "-"}
+                      </span>
+
+                    </div>
+
+                    <div className="info-row">
+
+                      <strong>Model :</strong>
+
+                      <span>
+                        {machine.model || "-"}
+                      </span>
+
+                    </div>
+                                        {/* Health Indicator */}
+
+                    <div className="health-section">
+
+                      <div className="health-header">
+
+                        <span>Machine Health</span>
+
+                        <strong>
+                          {machine.status === "Running"
+                            ? "100%"
+                            : machine.status === "Maintenance"
+                            ? "65%"
+                            : machine.status === "Offline"
+                            ? "20%"
+                            : "80%"}
+                        </strong>
+
+                      </div>
+
+                      <div className="health-bar">
+
+                        <div
+                          className={`health-fill ${status}`}
+                          style={{
+                            width:
+                              machine.status === "Running"
+                                ? "100%"
+                                : machine.status === "Maintenance"
+                                ? "65%"
+                                : machine.status === "Offline"
+                                ? "20%"
+                                : "80%",
+                          }}
+                        ></div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                  {/* Footer */}
+
+                  <div className="machine-card-footer">
 
                     <button
-
-                      className="view-btn"
-
+                      className="view-machine-btn"
                       onClick={() =>
-                        navigate(
-                          `/machines/${machine.machine_number}`
-                        )
+                        navigate(`/machines/${machine.machine_id}`)
                       }
-
                     >
+                      <FaEye />
 
-                      View
-
+                      View Details
                     </button>
 
-                  </td>
+                  </div>
 
-                </tr>
+                </div>
 
-              ))
+              );
 
-            )}
+            })
 
-          </tbody>
+          )}
 
-        </table>
+        </div>
 
       </div>
 
       {showModal && (
 
         <AddMachineModal
-
           onClose={() => {
-
             setShowModal(false);
-
             fetchMachines();
-
           }}
-
         />
 
       )}
